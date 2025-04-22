@@ -1,39 +1,34 @@
-import styles from "./page.module.css";
 import Image from "next/image";
+import { getMembersList } from "@/app/_libs/microcms";
+import { MEMBERS_LIST_LIMIT } from "@/app/_constants";
+import styles from "./page.module.css";
 
-import { getNewsList } from "@/app/_libs/microcms";
-import { TOP_NEWS_LIMIT } from "@/app/_constants";
-import NewsList from "@/app/_components/NewsList";
-import ButtonLink from "@/app/_components/ButtonLink";
-
-export default async function Home() {
-  const data = await getNewsList({
-    limit: TOP_NEWS_LIMIT,
-  });
+export default async function Page() {
+  const data = await getMembersList({ limit: MEMBERS_LIST_LIMIT });
   return (
-    <>
-      <section className={styles.top}>
-        <div>
-          <h1 className={styles.title}>テクノロジーの力で世界を変える</h1>
-          <p className={styles.description}>
-            私たちは市場をリードしているグローバルテックカンパニーです。
-          </p>
-        </div>
-        <Image
-          className={styles.bgimg}
-          src="/img-mv.jpg"
-          alt=""
-          width={4000}
-          height={1200}
-        />
-      </section>
-      <section className={styles.news}>
-        <h2 className={styles.newsTitle}>News</h2>
-        <NewsList news={data.contents} />
-        <div className={styles.newsLink}>
-          <ButtonLink href="/news">もっとみる</ButtonLink>
-        </div>
-      </section>
-    </>
+    <div className={styles.container}>
+      {data.contents.length === 0 ? (
+        <p className={styles.empty}>メンバーが登録されていません。</p>
+      ) : (
+        <ul>
+          {data.contents.map((member) => (
+            <li key={member.id} className={styles.list}>
+              <Image
+                src={member.image.url}
+                alt=""
+                width={member.image.width}
+                height={member.image.height}
+                className={styles.image}
+              />
+              <dl>
+                <dt className={styles.name}>{member.name}</dt>
+                <dd className={styles.position}>{member.position}</dd>
+                <dd className={styles.profile}>{member.profile}</dd>
+              </dl>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
